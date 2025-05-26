@@ -64,6 +64,9 @@ class TerraformPlugin : Plugin<Project> {
                 task.description = "Generates Terraform rc file, creates plugin cache directory, and downloads binary"
                 task.terraformRcMap.set(terraformSetupExt.terraformRcMap)
                 task.executable.set(terraformSetupExt.executable)
+                // val executableObj = executable.get()
+                //executableFile.set(executableObj.executablePath())
+                // task.executableFile.set(terraformSetupExt.executable.get().executablePath())
             }
         }
 

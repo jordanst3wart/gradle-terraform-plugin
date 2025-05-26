@@ -13,7 +13,7 @@ interface DownloadBinary {
     // fun getAndVerifyDistributionRoot(distDir: File, distributionDescription: String): File
 }
 
-enum class Executable(val executable: String, val url: String, val version: String): DownloadBinary {
+enum class Executable(val executable: String, val url: String, var version: String): DownloadBinary {
     TOFU("tofu", "https://github.com/opentofu/opentofu/releases", TERRAFORM_DEFAULT) {
         override fun uriFromVersion(): URL {
             val osArch = HashicorpUtils.osArch(OS)

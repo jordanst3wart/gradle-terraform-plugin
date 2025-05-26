@@ -25,6 +25,7 @@ import java.nio.file.attribute.PosixFilePermission.OTHERS_READ
 import java.nio.file.attribute.PosixFilePermission.OWNER_EXECUTE
 import java.nio.file.attribute.PosixFilePermission.OWNER_READ
 import java.nio.file.attribute.PosixFilePermission.OWNER_WRITE
+import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
 open class TerraformSetup: DefaultTask() {
@@ -36,8 +37,7 @@ open class TerraformSetup: DefaultTask() {
     val executable: Property<Executable> = project.objects.property(Executable::class.java)
 
     @get:OutputFile
-    @Optional
-    val executableFile: RegularFileProperty = project.objects.fileProperty()
+    val executableFile = project.objects.property(File::class.java) // could be RegularFileProperty
 
     @get:OutputFile
     val terraformRC: RegularFileProperty = project.objects.fileProperty()
@@ -50,7 +50,8 @@ open class TerraformSetup: DefaultTask() {
         description = "Generates Terraform rc file, creates plugin cache directory, and downloads binary"
         pluginCacheDir.set(Convention.pluginCacheDir(project))
         terraformRC.set(Convention.terraformRC(project))
-        // executableFile.set(Executable.TERRAFORM.executablePath())
+        val executableProvider = project.providers.provider { executable.get().executablePath()}
+        executableFile.set(executableProvider)
     }
 
     @TaskAction
@@ -102,18 +103,19 @@ open class TerraformSetup: DefaultTask() {
 
     private fun downloadAndExtractZipFile() {
         val executableObj = executable.get()
-        executableFile.set(executableObj.executablePath())
+        // executableFile.set(executableObj.executablePath())
+        // errors on line below for some reason
         executableObj.executablePath().parentFile.mkdirs()
         if (executableObj.version == Convention.TERRAFORM_DEFAULT) {
             logger.warn("Using Terraform default version of ${Convention.TERRAFORM_DEFAULT}, you should set a version")
         }
         val url = executableObj.uriFromVersion()
-        val result = downloadUncompressAndCheck(url, executableFile.get().asFile)
+        val result = downloadUncompressAndCheck(url, executableFile.get())
         cleanupTempDirectory(result.second)
         logger.lifecycle("File from $url downloaded to: ${result.first.absolutePath}")
         if (OperatingSystem.current().isUnix) {
             Files.setPosixFilePermissions(
-                executableFile.get().asFile.toPath(),
+                executableFile.get().toPath(),
                 setOf(
                     OWNER_READ, OWNER_WRITE, OWNER_EXECUTE,
                     GROUP_READ, GROUP_WRITE, GROUP_EXECUTE,
@@ -121,8 +123,8 @@ open class TerraformSetup: DefaultTask() {
                 )
             )
         }
-        if (executableFile.get().asFile.absolutePath != result.first.absolutePath) {
-            throw IllegalArgumentException("Output file does not match downloaded file: ${executableFile.get().asFile.absolutePath} != ${result.first.absolutePath}")
+        if (executableFile.get().absolutePath != result.first.absolutePath) {
+            throw IllegalArgumentException("Output file does not match downloaded file: ${executableFile.get().absolutePath} != ${result.first.absolutePath}")
         }
     }
 
@@ -156,36 +158,23 @@ open class TerraformSetup: DefaultTask() {
         val extractedFiles = mutableListOf<File>()
 
         ZipInputStream(zipFile.inputStream()).use { zipInput ->
-            val entry = zipInput.nextEntry
-            if (entry != null) {
-                throw IllegalArgumentException("Zip file is empty: $zipFile")
-            }
-            if (entry?.name == null) {
-                throw IllegalArgumentException("Zip file entry name is null: $zipFile")
-            }
-
-            extractionPath.parentFile.mkdirs()
             val fileName = extractionPath.toString().substringAfterLast('/')
-            if (fileName != zipFile.name) {
-                throw IllegalArgumentException("Zip file name does not match: $fileName != ${zipFile.name}")
-            }
+            var entry: ZipEntry?
+            do {
+                entry = zipInput.nextEntry
+                if (entry == null) {
+                    throw IllegalArgumentException("Expect binary $fileName not found in: $zipFile")
+                }
+            } while (fileName != entry.name && !entry.isDirectory)
+            extractionPath.parentFile.mkdirs()
             val entryFile = File(extractionPath.parentFile, entry.name)
 
-            // Security check: prevent directory traversal attacks
-            if (!entryFile.canonicalPath.startsWith(extractionPath.canonicalPath)) {
-                throw SecurityException("Entry '${entry.name}' would extract outside of target directory")
+            entryFile.parentFile?.mkdirs()
+            entryFile.outputStream().use { output ->
+                zipInput.copyTo(output)
             }
-
-            if (entry.isDirectory) {
-                throw IllegalArgumentException("Zip file contains a directory: ${entry.name}")
-            } else {
-                entryFile.parentFile?.mkdirs()
-                entryFile.outputStream().use { output ->
-                    zipInput.copyTo(output)
-                }
-                extractedFiles.add(entryFile)
-                logger.lifecycle("Extracted file: ${entryFile.name} (${entryFile.length()} bytes)")
-            }
+            extractedFiles.add(entryFile)
+            logger.lifecycle("Extracted file: ${entryFile.name} (${entryFile.length()} bytes)")
         }
 
         return extractedFiles[0]
