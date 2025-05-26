@@ -13,14 +13,29 @@ dependencies {
     implementation(kotlin("stdlib"))
     implementation(gradleApi())
 
-    testImplementation("org.spockframework:spock-core:2.3-groovy-3.0")
-    testImplementation("junit:junit:4.13.2")
-    testImplementation(localGroovy())
+    // TODO upgrade to junit 5
+
+    // testImplementation("org.spockframework:spock-core:2.3-groovy-3.0")
+    // testImplementation("junit:junit:4.13.2")
+    // JUnit 5 (Jupiter) - Main testing framework
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.1")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.1")
+
+    // Optional: JUnit 5 parameter tests if you want to use parameterized tests
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.1")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.9.2") // this one needed???
+
+    testImplementation(kotlin("stdlib"))
+    // testImplementation(localGroovy())
     testImplementation(gradleTestKit())
+
+    //integrationTest("org.spockframework:spock-core:2.3-groovy-3.0")
+    //integrationTestImplementation("your-integration-test-dependency")
 }
 
 java {
     toolchain {
+        // TODO upgrade to 17
         languageVersion.set(JavaLanguageVersion.of(11))
     }
 }
