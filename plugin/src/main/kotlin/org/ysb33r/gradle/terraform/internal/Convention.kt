@@ -29,11 +29,6 @@ object Convention {
     }
 
     @JvmStatic
-    fun sourceSetDisplayName(sourceSetName: String): String {
-        return "Terraform source set for $sourceSetName"
-    }
-
-    @JvmStatic
     fun createTasksByConvention(project: Project, sourceSet: TerraformSourceSet) {
         DefaultTerraformTasks.tasks().forEach {
             registerTask(sourceSet, project, it)

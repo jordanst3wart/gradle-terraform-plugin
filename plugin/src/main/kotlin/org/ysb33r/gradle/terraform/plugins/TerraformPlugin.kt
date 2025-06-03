@@ -16,7 +16,6 @@ import org.ysb33r.gradle.terraform.tasks.RemoteStateTask
 import org.ysb33r.gradle.terraform.tasks.TerraformFmtCheck
 
 import org.gradle.language.base.plugins.LifecycleBasePlugin.CHECK_TASK_NAME
-import org.ysb33r.gradle.terraform.internal.Convention.sourceSetDisplayName
 import org.ysb33r.gradle.terraform.tasks.DefaultTerraformTasks.FMT_APPLY
 import org.ysb33r.gradle.terraform.internal.Convention.createTasksByConvention
 import org.ysb33r.gradle.terraform.internal.Convention.taskName
@@ -78,7 +77,6 @@ class TerraformPlugin : Plugin<Project> {
                     TerraformSourceSet::class.java,
                     project,
                     name,
-                    sourceSetDisplayName(name)
                 )
             }
             val sourceSetContainer =

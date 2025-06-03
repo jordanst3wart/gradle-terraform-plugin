@@ -153,7 +153,7 @@ abstract class TerraformTask(): DefaultTask() {
         this.commandLineProviders.add(provider)
     }
 
-    protected fun buildExecSpec(): ExecSpec {
+    fun buildExecSpec(): ExecSpec {
         // TODO fix
         val execSpec = ExecSpec(terraformSetup.executable.get().executablePath().toString(),
             tfCommand,

@@ -19,7 +19,6 @@ import javax.inject.Inject
 open class TerraformSourceSet @Inject constructor(
     project: Project,
     val name: String,
-    val displayName: String
 ) : PatternFilterable {
     // TODO could change to backendFile...
     // backend text is a bit weird
@@ -47,7 +46,7 @@ open class TerraformSourceSet @Inject constructor(
     }
 
     override fun toString(): String {
-        return this.displayName
+        return "Terraform source set for $name"
     }
 
     fun setBackendText(backText: File) {
