@@ -11,7 +11,7 @@ class TerraformDestroySpec extends Specification {
 
     void 'commands for terraform destroy'() {
         setup:
-        project.apply plugin: 'foo.bar.terraform'
+        project.apply plugin: 'org.ysb33r.terraform'
 
 
         when:

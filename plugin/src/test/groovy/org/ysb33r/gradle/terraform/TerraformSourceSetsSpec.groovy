@@ -12,7 +12,7 @@ class TerraformSourceSetsSpec extends Specification {
 
     void 'Variable definitions in source set should not create new source sets'() {
         setup:
-        project.apply plugin: 'foo.bar.terraform'
+        project.apply plugin: 'org.ysb33r.terraform'
 
         when:
         project.allprojects {
@@ -40,7 +40,7 @@ class TerraformSourceSetsSpec extends Specification {
 
     void 'test different variables supported'() {
         setup:
-        project.apply plugin: 'foo.bar.terraform'
+        project.apply plugin: 'org.ysb33r.terraform'
 
         when:
         Map<String, ?> myMap = [name: 'John', age: 30, city: 'New York']
@@ -69,7 +69,7 @@ class TerraformSourceSetsSpec extends Specification {
 
     void 'Items must be able resolve entities in project scope'() {
         setup:
-        project.apply plugin: 'foo.bar.terraform'
+        project.apply plugin: 'org.ysb33r.terraform'
         project.extensions.create('testExt', TestExtension, project.providers, project)
 
         when:
@@ -81,7 +81,7 @@ class TerraformSourceSetsSpec extends Specification {
 
     void 'Items must be able resolve entities in project scope even with different order of plugins applied'() {
         setup:
-        project.apply plugin: 'foo.bar.terraform'
+        project.apply plugin: 'org.ysb33r.terraform'
         project.extensions.create('testExt', TestExtension, project.providers, project)
 
         when:
@@ -93,7 +93,7 @@ class TerraformSourceSetsSpec extends Specification {
 
     void 'Can provide a tfvars file'() {
         setup:
-        project.apply plugin: 'foo.bar.terraform'
+        project.apply plugin: 'org.ysb33r.terraform'
 
         project.allprojects {
             terraformSourceSets {
@@ -124,7 +124,7 @@ class TerraformSourceSetsSpec extends Specification {
 
     void 'source sets'() {
         setup:
-        project.apply plugin: 'foo.bar.terraform'
+        project.apply plugin: 'org.ysb33r.terraform'
         project.allprojects {
             terraformSourceSets {
                 main {

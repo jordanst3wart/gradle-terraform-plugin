@@ -1,4 +1,4 @@
-import org.ysb33r.gradle.terraform.internal.Executable
+/*import org.ysb33r.gradle.terraform.internal.Executable
 
 plugins {
     // using local maven snapshot of the plugin
