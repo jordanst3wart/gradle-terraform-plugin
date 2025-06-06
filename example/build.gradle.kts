@@ -1,8 +1,10 @@
 import org.ysb33r.gradle.terraform.internal.Executable
 
 plugins {
+    // using local maven snapshot of the plugin
+    // should be moved to includeBuild detailed here: https://docs.gradle.org/current/userguide/testing_gradle_plugins.html#manual-tests
     // builds to: ~/.m2/repository/foo/bar/terraform/foo.bar.terraform.gradle.plugin/INSTALLER3-SNAPSHOT
-    id("foo.bar.terraform") version "TESTS-IN-KOTLIN-SNAPSHOT"
+    id("org.ysb33r.terraform") version "TESTS-IN-KOTLIN-SNAPSHOT"
 }
 
 terraformSetup {

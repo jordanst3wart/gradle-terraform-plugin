@@ -55,7 +55,7 @@ fun createVersion(): String {
 gradlePlugin {
     plugins {
         create("terraformPlugin") {
-            id = "foo.bar.terraform" // property("ID").toString()
+            id = "org.ysb33r.terraform" // property("ID").toString()
             implementationClass = "org.ysb33r.gradle.terraform.plugins.TerraformPlugin"
             version = createVersion()
             displayName = "Terraform Plugin"
