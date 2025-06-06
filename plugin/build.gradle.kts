@@ -3,7 +3,7 @@ import java.util.Date
 
 plugins {
     groovy
-    kotlin("jvm") version "2.1.21"
+    kotlin("jvm") version libs.versions.kotlin
     `java-gradle-plugin`
     `maven-publish`
     alias(libs.plugins.grgit)
@@ -12,17 +12,16 @@ plugins {
 dependencies {
     implementation(kotlin("stdlib"))
     implementation(gradleApi())
-    api("org.ysb33r.gradle:grolifant-herd:3.0.1")
-
+    // TODO competely rewrite tests, and remove all groovy dependencies
     testImplementation("org.spockframework:spock-core:2.3-groovy-3.0")
-    testImplementation("junit:junit:4.13.2")
+    testImplementation("junit:junit:4.13.2") // bump to junit 5
     testImplementation(localGroovy())
     testImplementation(gradleTestKit())
-    testImplementation("org.ysb33r.gradle:grolifant-herd:3.0.1")
 }
 
 java {
     toolchain {
+        // TODO upgrade to 17
         languageVersion.set(JavaLanguageVersion.of(11))
     }
 }

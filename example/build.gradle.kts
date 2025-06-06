@@ -1,7 +1,14 @@
-/*import org.ysb33r.gradle.terraform.TerraformRCExtension
+import org.ysb33r.gradle.terraform.internal.Executable
 
 plugins {
-    id("foo.bar.terraform")
+    // builds to: ~/.m2/repository/foo/bar/terraform/foo.bar.terraform.gradle.plugin/INSTALLER3-SNAPSHOT
+    id("foo.bar.terraform") version "TESTS-IN-KOTLIN-SNAPSHOT"
+}
+
+terraformSetup {
+    val binary = Executable.TERRAFORM
+    binary.version = "1.10.1" // TODO should be a nicer api call than this
+    executable.set(binary)
 }
 
 terraform {
@@ -9,12 +16,6 @@ terraform {
     useGoogleEnvironment()
     setLockTimeout(31)
     setParallel(11)
-    executable(mapOf("version" to "1.10.1"))
-}
-
-// terraformRCExtension define extensions...
-project.extensions.getByType<TerraformRCExtension>().apply {
-    pluginCacheMayBreakDependencyLockFile = true
 }
 
 terraformSourceSets {
@@ -25,5 +26,13 @@ terraformSourceSets {
     create("aws") {
         srcDir.set(File("src/aws/tf"))
         backendText.set("# foo = bar") // TODO needs to be defined..., could be optional
+    }
+}
+
+
+/*develocity {
+    buildScan {
+        termsOfUseUrl.set("https://gradle.com/help/legal-terms-of-use")
+        termsOfUseAgree.set("no")
     }
 }

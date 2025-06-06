@@ -1,20 +1,18 @@
 pluginManagement {
-    resolutionStrategy {
-        eachPlugin {
-            // get local build version
-            // logger.lifecycle(requested.id.name.toString())
-            // has to be published to maven local
-            /*if (requested.id.id == "foo.bar.terraform") {
-                useModule("gradle-terraform-plugin:plugin:FIX-VERSIONS6-SNAPSHOT")
-            }*/
-        }
-    }
     fun getEnvOrThrow(environmentVariable: String): String =
-        System.getenv(environmentVariable) ?: throw InvalidUserDataException("Please provide \"$environmentVariable\" environment variable")
+        System.getenv(environmentVariable) ?: throw InvalidUserDataException("Please provide \"$environmentVariable\" env varname")
+
     repositories {
         mavenLocal()
         gradlePluginPortal()
         mavenCentral()
+        maven {
+            url = uri("https://maven.pkg.github.com/jordanst3wart/gradle-terraform-plugin")
+            credentials {
+                username = getEnvOrThrow("GH_USERNAME")
+                password = getEnvOrThrow("GH_PACKAGES_TOKEN")
+            }
+        }
     }
 }
 

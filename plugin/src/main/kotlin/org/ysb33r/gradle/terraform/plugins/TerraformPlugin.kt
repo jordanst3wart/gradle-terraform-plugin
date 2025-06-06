@@ -8,20 +8,20 @@ import org.gradle.api.Task
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.ysb33r.gradle.terraform.TerraformExtension
-import org.ysb33r.gradle.terraform.TerraformRCExtension
+import org.ysb33r.gradle.terraform.TerraformSetupExtension
 import org.ysb33r.gradle.terraform.TerraformSourceSet
 import org.ysb33r.gradle.terraform.internal.Convention
 import org.ysb33r.gradle.terraform.tasks.TerraformTask
 import org.ysb33r.gradle.terraform.tasks.RemoteStateTask
 import org.ysb33r.gradle.terraform.tasks.TerraformFmtCheck
-import org.ysb33r.grolifant.api.core.ProjectOperations
 
 import org.gradle.language.base.plugins.LifecycleBasePlugin.CHECK_TASK_NAME
-import org.ysb33r.gradle.terraform.internal.Convention.sourceSetDisplayName
 import org.ysb33r.gradle.terraform.tasks.DefaultTerraformTasks.FMT_APPLY
 import org.ysb33r.gradle.terraform.internal.Convention.createTasksByConvention
 import org.ysb33r.gradle.terraform.internal.Convention.taskName
-import java.io.StringWriter
+import org.ysb33r.gradle.terraform.tasks.DefaultTerraformTasks
+import org.ysb33r.gradle.terraform.tasks.TerraformSetup
+import org.ysb33r.gradle.terraform.tasks.TerraformValidate
 
 /**
  * Provide the basic capabilities for dealing with Terraform tasks. Allow for downloading & caching of
@@ -30,16 +30,15 @@ import java.io.StringWriter
 class TerraformPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
-        ProjectOperations.maybeCreateExtension(project)
-        configureTerraformRC(project)
+        registerSetupTerraformTask(project)
 
         project.tasks.withType(RemoteStateTask::class.java).configureEach { t ->
             t.group = Convention.TERRAFORM_TASK_GROUP
-            t.dependsOn(TerraformRCExtension.TERRAFORM_RC_TASK)
+            t.dependsOn(TerraformSetupExtension.TERRAFORM_SETUP_TASK)
         }
 
         project.tasks.withType(TerraformTask::class.java).configureEach { t ->
-            t.dependsOn(TerraformRCExtension.TERRAFORM_RC_TASK)
+            t.dependsOn(TerraformSetupExtension.TERRAFORM_SETUP_TASK)
         }
 
         project.extensions.create(TerraformExtension.NAME, TerraformExtension::class.java, project)
@@ -52,27 +51,21 @@ class TerraformPlugin : Plugin<Project> {
         }
         terraformSourceSetConventionTaskRules(project, sourceSetContainer, formatAll)
         configureCheck(project)
+        configureRootTask(project)
     }
 
     companion object {
-        private fun configureTerraformRC(project: Project) {
-            val terraformRcExt = project.extensions
-                .create(Convention.TERRAFORM_RC_EXT, TerraformRCExtension::class.java, project)
-            project.tasks.register(TerraformRCExtension.TERRAFORM_RC_TASK) { task ->
+        private fun registerSetupTerraformTask(project: Project) {
+            val terraformSetupExt = project.extensions
+                .create(Convention.TERRAFORM_SETUP_EXT, TerraformSetupExtension::class.java, project)
+            project.tasks.register(TerraformSetupExtension.TERRAFORM_SETUP_TASK, TerraformSetup::class.java) { task ->
                 task.group = Convention.TERRAFORM_TASK_GROUP
-                task.description = "Generates Terraform configuration file"
-                task.onlyIf { !terraformRcExt.useGlobalConfig }
-                // I don't know if this is useful
-                task.inputs.property("details") {
-                    val writer = StringWriter()
-                    terraformRcExt.toHCL(writer).toString()
-                }
-                task.outputs.file(terraformRcExt.getTerraformRC())
-                task.doLast {
-                    terraformRcExt.getTerraformRC().asFile.bufferedWriter().use { writer ->
-                        terraformRcExt.toHCL(writer)
-                    }
-                }
+                task.description = "Generates Terraform rc file, creates plugin cache directory, and downloads binary"
+                task.terraformRcMap.set(terraformSetupExt.terraformRcMap)
+                task.executable.set(terraformSetupExt.executable)
+                // val executableObj = executable.get()
+                //executableFile.set(executableObj.executablePath())
+                // task.executableFile.set(terraformSetupExt.executable.get().executablePath())
             }
         }
 
@@ -84,7 +77,6 @@ class TerraformPlugin : Plugin<Project> {
                     TerraformSourceSet::class.java,
                     project,
                     name,
-                    sourceSetDisplayName(name)
                 )
             }
             val sourceSetContainer =
@@ -111,6 +103,21 @@ class TerraformPlugin : Plugin<Project> {
             val check = project.tasks.named(CHECK_TASK_NAME)
             check.configure {
                 it.dependsOn(project.tasks.withType(TerraformFmtCheck::class.java))
+                it.dependsOn(project.tasks.withType(TerraformValidate::class.java))
+            }
+        }
+
+        // root tasks to run plans for all source sets
+        private fun configureRootTask(project: Project) {
+            DefaultTerraformTasks.tasks().forEach { task ->
+                project.tasks.findByName(task.command)
+                    ?: project.tasks.register(task.command) {
+                        it.group = Convention.TERRAFORM_TASK_GROUP
+                    }
+
+                project.tasks.getByName(task.command) {
+                    it.dependsOn(project.tasks.withType(task.type))
+                }
             }
         }
     }

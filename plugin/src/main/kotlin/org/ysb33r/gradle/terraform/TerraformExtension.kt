@@ -1,21 +1,9 @@
 package org.ysb33r.gradle.terraform
 
-import org.gradle.api.GradleException
 import org.gradle.api.Project
-import org.gradle.internal.os.OperatingSystem
 import org.ysb33r.gradle.terraform.config.Json
 import org.ysb33r.gradle.terraform.config.Lock
 import org.ysb33r.gradle.terraform.config.Parallel
-import org.ysb33r.gradle.terraform.internal.DownloaderTerraform
-import org.ysb33r.gradle.terraform.internal.DownloaderBinary
-import org.ysb33r.gradle.terraform.internal.DownloaderOpenTofu
-import org.ysb33r.grolifant.api.core.ProjectOperations
-import org.ysb33r.grolifant.api.v4.exec.DownloadedExecutable
-import org.ysb33r.grolifant.api.v4.exec.DownloaderFactory
-import org.ysb33r.grolifant.api.v4.exec.ExternalExecutable
-import org.ysb33r.grolifant.api.v4.exec.ResolvableExecutable
-import org.ysb33r.grolifant.api.v4.exec.ResolveExecutableByVersion
-import org.ysb33r.grolifant.api.v4.exec.ResolverFactoryRegistry
 import org.gradle.api.provider.Property
 
 /** Configure project defaults or task specifics for `Terraform`.
@@ -27,12 +15,6 @@ import org.gradle.api.provider.Property
  * ```
  *   // By tag (Gradle will download and cache the correct distribution).
  *   executable(mapOf("tag" to "0.10.1"))
- *
- *   // By a physical path
- *   executable(mapOf("path" to "/path/to/terraform"))
- *
- *   // By using searchPath (will attempt to locate in search path).
- *   executable(mapOf("searchPath" to ""))
  * ```
  *
  * If the build runs on a platform that supports downloading of the `terraform` executable
@@ -45,36 +27,16 @@ import org.gradle.api.provider.Property
 open class TerraformExtension(private val project: Project) {
     companion object {
         const val NAME = "terraform"
-        const val TERRAFORM_DEFAULT = "1.8.0"
     }
 
-    lateinit var resolvableExecutable: ResolvableExecutable
-
     val env = mutableMapOf<String, String>()
-    val registry: ResolverFactoryRegistry = ResolverFactoryRegistry(project)
-    val projectOperations: ProjectOperations = ProjectOperations.maybeCreateExtension(project)
     val lock = Lock()
     val parallel = Parallel()
     val json = Json()
     val logLevel : Property<String> = project.objects.property(String::class.java)
 
     init {
-        if (!DownloaderTerraform.isDownloadSupported()) {
-            throw GradleException(
-                "Terraform distribution not supported on ${OperatingSystem.current().name}"
-            )
-        }
-        logLevel.set("INFO")
-        addVersionResolver(projectOperations)
-        executable(mapOf("version" to TERRAFORM_DEFAULT))
-    }
-
-    fun getResolver(): ExternalExecutable {
-        return this.registry
-    }
-
-    fun executable(opts: Map<String, Any?>) {
-        this.resolvableExecutable = this.registry.getResolvableExecutable(opts)
+        logLevel.set("WARN")
     }
 
     /** Replace current environment with new one.
@@ -125,23 +87,6 @@ open class TerraformExtension(private val project: Project) {
 
     fun setJson(enabled: Boolean) {
         this.json.enabled = enabled
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    private fun addVersionResolver(projectOperations: ProjectOperations) {
-        val tofu = project.rootProject.properties.getOrDefault("opentofu", false)
-        val resolver = DownloadedExecutable { installer: DownloaderBinary -> installer.terraformExecutablePath() }
-        if (tofu == true) {
-            val downloaderFactory = DownloaderFactory { options, version, p -> DownloaderOpenTofu(version, p) }
-            this.registry.registerExecutableKeyActions(
-                ResolveExecutableByVersion<DownloaderOpenTofu>(projectOperations, downloaderFactory, resolver)
-            )
-        } else {
-            val downloaderFactory = DownloaderFactory { options, version, p -> DownloaderTerraform(version, p) }
-            this.registry.registerExecutableKeyActions(
-                ResolveExecutableByVersion<DownloaderTerraform>(projectOperations, downloaderFactory, resolver)
-            )
-        }
     }
 
     private fun awsEnvironment(): Map<String, String> {
