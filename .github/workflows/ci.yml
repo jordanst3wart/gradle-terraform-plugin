@@ -5,17 +5,12 @@ on:
     push:
         branches:
             - '*'
-        tags-ignore:
-            - '*'
-    pull_request:
-        branches:
-            - '*'
 
 jobs:
     build:
         strategy:
             matrix:
-                java: [11, 17]
+                java: [21, 17]
         runs-on: ubuntu-latest
         env:
             GH_USERNAME: ${{ secrets.GH_USERNAME }}
@@ -39,7 +34,7 @@ jobs:
 
             - name: Publish Plugin to github if main branch
               run: |
-                  if [ "${{ matrix.java }}" == "11" ]; then
+                  if [ "${{ matrix.java }}" == "21" ]; then
                     ./gradlew publishAllPublicationsToGithubPackagesRepository --stacktrace
                   fi
               if: success() && github.event_name == 'push' && github.ref == 'refs/heads/master'
