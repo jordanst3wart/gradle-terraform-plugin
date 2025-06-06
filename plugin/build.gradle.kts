@@ -22,7 +22,7 @@ dependencies {
 java {
     toolchain {
         // TODO upgrade to 17
-        languageVersion.set(JavaLanguageVersion.of(11))
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
 

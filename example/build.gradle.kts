@@ -28,11 +28,3 @@ terraformSourceSets {
         backendText.set("# foo = bar") // TODO needs to be defined..., could be optional
     }
 }
-
-
-/*develocity {
-    buildScan {
-        termsOfUseUrl.set("https://gradle.com/help/legal-terms-of-use")
-        termsOfUseAgree.set("no")
-    }
-}
