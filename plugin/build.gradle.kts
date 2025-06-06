@@ -12,17 +12,13 @@ plugins {
 dependencies {
     implementation(kotlin("stdlib"))
     implementation(gradleApi())
-    // TODO competely rewrite tests, and remove all groovy dependencies
-    testImplementation("org.spockframework:spock-core:2.3-groovy-3.0")
-    testImplementation("junit:junit:4.13.2") // bump to junit 5
-    testImplementation(localGroovy())
-    testImplementation(gradleTestKit())
+    // bump to groovy 4 when supported, or use kotlin (hard atm)
+    testImplementation("org.spockframework:spock-core:2.4-M6-groovy-3.0")
 }
 
 java {
     toolchain {
-        // TODO upgrade to 17
-        languageVersion.set(JavaLanguageVersion.of(11))
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
 
@@ -59,7 +55,7 @@ fun createVersion(): String {
 gradlePlugin {
     plugins {
         create("terraformPlugin") {
-            id = "foo.bar.terraform" // property("ID").toString()
+            id = "org.ysb33r.terraform" // property("ID").toString()
             implementationClass = "org.ysb33r.gradle.terraform.plugins.TerraformPlugin"
             version = createVersion()
             displayName = "Terraform Plugin"
