@@ -2,7 +2,7 @@ import org.ysb33r.gradle.terraform.internal.Executable
 
 plugins {
     // builds to: ~/.m2/repository/foo/bar/terraform/foo.bar.terraform.gradle.plugin/INSTALLER3-SNAPSHOT
-    id("foo.bar.terraform") version "GET-AHEAD-OF-MYSELF-SNAPSHOT"
+    id("foo.bar.terraform") version "TESTS-IN-KOTLIN-SNAPSHOT"
 }
 
 terraformSetup {
