@@ -12,16 +12,12 @@ plugins {
 dependencies {
     implementation(kotlin("stdlib"))
     implementation(gradleApi())
-    // TODO competely rewrite tests, and remove all groovy dependencies
+    // bump to groovy 4 when supported, or use kotlin (hard atm)
     testImplementation("org.spockframework:spock-core:2.3-groovy-3.0")
-    testImplementation("junit:junit:4.13.2") // bump to junit 5
-    testImplementation(localGroovy())
-    testImplementation(gradleTestKit())
 }
 
 java {
     toolchain {
-        // TODO upgrade to 17
         languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
