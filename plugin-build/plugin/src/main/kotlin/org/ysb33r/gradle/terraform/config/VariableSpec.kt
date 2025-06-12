@@ -1,6 +1,7 @@
 package org.ysb33r.gradle.terraform.config
 
 interface VariableSpec {
+    @Suppress("ktlint:standard:function-naming")
     fun `var`(
         name: String,
         value: Any,
