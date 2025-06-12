@@ -59,12 +59,20 @@ tasks.register("check") {
 
 tasks.register("test") {
     group = "verification"
+    // could include example:test
     dependsOn(gradle.includedBuild("plugin-build").task(":plugin:test"))
 }
 
 tasks.register("build") {
     group = "build"
+    // could include example:build
     dependsOn(gradle.includedBuild("plugin-build").task(":plugin:build"))
+}
+
+tasks.register("assemble") {
+    group = "build"
+    // could include example:assemble
+    dependsOn(gradle.includedBuild("plugin-build").task(":plugin:assemble"))
 }
 
 tasks.wrapper {
