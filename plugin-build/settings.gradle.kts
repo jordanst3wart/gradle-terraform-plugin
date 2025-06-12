@@ -7,7 +7,8 @@ pluginManagement {
 
 dependencyResolutionManagement {
     fun getEnvOrThrow(environmentVariable: String): String =
-        System.getenv(environmentVariable) ?: throw InvalidUserDataException("Please provide \"$environmentVariable\" environment variable")
+        System.getenv(environmentVariable)
+            ?: throw InvalidUserDataException("Please provide \"$environmentVariable\" environment variable")
 
     repositories {
         google()
