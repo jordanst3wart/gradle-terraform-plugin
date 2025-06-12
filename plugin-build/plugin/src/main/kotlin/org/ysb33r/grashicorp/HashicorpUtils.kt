@@ -10,14 +10,15 @@ object HashicorpUtils {
 
     @JvmStatic
     fun osArch(os: OperatingSystem): String {
-        val osName = when {
-            os.isWindows -> "windows"
-            os.isLinux -> "linux"
-            os.isMacOsX -> "darwin"
-            else -> throw IllegalArgumentException("OS is not supported: $os")
-        }
+        val osName =
+            when {
+                os.isWindows -> "windows"
+                os.isLinux -> "linux"
+                os.isMacOsX -> "darwin"
+                else -> throw IllegalArgumentException("OS is not supported: $os")
+            }
         val arch = getArch()
-        return "${osName}_${arch}"
+        return "${osName}_$arch"
     }
 
     @JvmStatic
@@ -33,7 +34,10 @@ object HashicorpUtils {
     }
 
     @JvmStatic
-    fun escapedFilePath(os: OperatingSystem, path: File): String {
+    fun escapedFilePath(
+        os: OperatingSystem,
+        path: File,
+    ): String {
         return if (os.isWindows) {
             path.absolutePath.replace(BACKSLASH.toRegex(), DOUBLE_BACKSLASH)
         } else {

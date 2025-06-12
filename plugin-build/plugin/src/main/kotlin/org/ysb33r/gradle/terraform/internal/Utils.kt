@@ -8,17 +8,26 @@ object Utils {
     val OS: OperatingSystem = OperatingSystem.current()
 
     @JvmStatic
-    fun terraformLogFile(name: String, logDir: DirectoryProperty): File {
-        return File(logDir.get().asFile, "${name}.log").absoluteFile
+    fun terraformLogFile(
+        name: String,
+        logDir: DirectoryProperty,
+    ): File {
+        return File(logDir.get().asFile, "$name.log").absoluteFile
     }
 
     @JvmStatic
-    fun terraformStdErrLogFile(name: String, logDir: DirectoryProperty): File {
+    fun terraformStdErrLogFile(
+        name: String,
+        logDir: DirectoryProperty,
+    ): File {
         return File(logDir.get().asFile, "${name}StdErr.log").absoluteFile
     }
 
     @JvmStatic
-    fun terraformStdOutLogFile(name: String, logDir: DirectoryProperty): File {
+    fun terraformStdOutLogFile(
+        name: String,
+        logDir: DirectoryProperty,
+    ): File {
         return File(logDir.get().asFile, "${name}StdOut.log").absoluteFile
     }
 
@@ -31,12 +40,12 @@ object Utils {
                 "HOMEDRIVE" to (System.getenv("HOMEDRIVE") ?: ""),
                 "HOMEPATH" to (System.getenv("HOMEPATH") ?: ""),
                 "USERPROFILE" to (System.getenv("USERPROFILE") ?: ""),
-                OS.pathVar to (System.getenv(OS.pathVar) ?: "")
+                OS.pathVar to (System.getenv(OS.pathVar) ?: ""),
             )
         } else {
             mapOf(
                 "HOME" to System.getProperty("user.home"),
-                OS.pathVar to (System.getenv(OS.pathVar) ?: "")
+                OS.pathVar to (System.getenv(OS.pathVar) ?: ""),
             )
         }
     }

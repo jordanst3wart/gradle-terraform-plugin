@@ -4,7 +4,7 @@ package org.ysb33r.gradle.terraform.tasks
 enum class DefaultTerraformTasks(
     val command: String,
     val type: Class<out TerraformTask>,
-    val description: String
+    val description: String,
 ) {
     INIT("init", TerraformInit::class.java, "Initialises Terraform"),
     SHOW_STATE("showState", TerraformShowState::class.java, "Generates a report on the current state"),
@@ -15,7 +15,8 @@ enum class DefaultTerraformTasks(
     DESTROY("destroy", TerraformDestroy::class.java, "Destroys infrastructure"),
     VALIDATE("validate", TerraformValidate::class.java, "Validates the Terraform configuration"),
     FMT_CHECK("fmtCheck", TerraformFmtCheck::class.java, "Checks whether files are correctly formatted"),
-    FMT_APPLY("fmtApply", TerraformFmtApply::class.java, "Formats source files in source set");
+    FMT_APPLY("fmtApply", TerraformFmtApply::class.java, "Formats source files in source set"),
+    ;
 
     companion object {
         fun tasks(): List<DefaultTerraformTasks> {

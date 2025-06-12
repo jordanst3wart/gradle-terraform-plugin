@@ -3,14 +3,13 @@ package org.ysb33r.gradle.terraform.tasks
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.options.Option
 import org.ysb33r.gradle.terraform.ExecSpec
-
 import javax.inject.Inject
 
 /** Equivalent of {@code terraform show /path/to/terraform.plan}.
  */
 abstract class TerraformShow : TerraformTask {
-    //@OutputFile
-    //val statusReportOutputFile: Property<File> = project.objects.property(File::class.java)
+    // @OutputFile
+    // val statusReportOutputFile: Property<File> = project.objects.property(File::class.java)
 
     @Inject
     constructor() : super("show", emptyList()) {
@@ -28,10 +27,10 @@ abstract class TerraformShow : TerraformTask {
 
     override fun exec() {
         super.exec()
-        //val fileLocation: URI = statusReportOutputFile.get().toURI()
-        //logger.lifecycle(
+        // val fileLocation: URI = statusReportOutputFile.get().toURI()
+        // logger.lifecycle(
         //    "The textual representation of the state file has been generated into $fileLocation"
-        //)
+        // )
     }
 
     override fun addCommandSpecificsToExecSpec(execSpec: ExecSpec): ExecSpec {

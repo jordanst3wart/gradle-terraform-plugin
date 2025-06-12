@@ -7,17 +7,18 @@ import org.ysb33r.gradle.terraform.config.Json
 import org.ysb33r.gradle.terraform.config.Lock
 import org.ysb33r.gradle.terraform.config.Parallel
 import org.ysb33r.gradle.terraform.config.Refresh
-
-import javax.inject.Inject
 import java.io.File
+import javax.inject.Inject
 
 abstract class TerraformApply : TerraformTask {
-
     @InputFile
     val planFiles: Provider<File>
 
     @Inject
-    constructor() : super("apply", listOf(Lock::class.java, Refresh::class.java, Parallel::class.java, Json::class.java)) {
+    constructor() : super(
+        "apply",
+        listOf(Lock::class.java, Refresh::class.java, Parallel::class.java, Json::class.java),
+    ) {
         supportsAutoApprove()
         supportsInputs()
         supportsColor()

@@ -19,7 +19,10 @@ object Convention {
     const val TERRAFORM_DEFAULT = "1.8.0"
 
     @JvmStatic
-    fun taskName(sourceSetName: String, commandType: String): String {
+    fun taskName(
+        sourceSetName: String,
+        commandType: String,
+    ): String {
         return "${commandType}${sourceSetName.capitalize()}"
     }
 
@@ -29,7 +32,10 @@ object Convention {
     }
 
     @JvmStatic
-    fun createTasksByConvention(project: Project, sourceSet: TerraformSourceSet) {
+    fun createTasksByConvention(
+        project: Project,
+        sourceSet: TerraformSourceSet,
+    ) {
         DefaultTerraformTasks.tasks().forEach {
             registerTask(sourceSet, project, it)
         }
@@ -45,11 +51,11 @@ object Convention {
         val newTaskName = taskName(sourceSet.name, taskDetails.command)
         project.tasks.register(
             newTaskName,
-            taskDetails.type
+            taskDetails.type,
         ) { t ->
             t.sourceSet.set(sourceSet)
             t.group = TERRAFORM_TASK_GROUP
-            t.description = "${taskDetails.description} for '${name}'"
+            t.description = "${taskDetails.description} for '$name'"
             // TODO simplify this
             if (taskDetails != INIT) {
                 t.mustRunAfter(taskName(name, INIT.command))
@@ -71,22 +77,30 @@ object Convention {
 
     private fun registerBackendConfigurationTask(
         sourceSet: TerraformSourceSet,
-        project: Project
+        project: Project,
     ) {
-        val remoteStateTask: TaskProvider<RemoteStateTask> = project.tasks.register(
-            backendTaskName(sourceSet.name),
-            RemoteStateTask::class.java
-        ) { it ->
-            it.group = TERRAFORM_TASK_GROUP
-            it.description = "Write partial backend configuration file for '${sourceSet.name}'"
-            it.backendText.set(sourceSet.backendText.map { text -> text })
-            // TODO clean this up I could add this logic to the source set
-            it.backendConfig.set(File(project.layout.buildDirectory.get().asFile, "${sourceSet.name}/tf/remoteState/backend-config.tf"))
-        }
+        val remoteStateTask: TaskProvider<RemoteStateTask> =
+            project.tasks.register(
+                backendTaskName(sourceSet.name),
+                RemoteStateTask::class.java,
+            ) { it ->
+                it.group = TERRAFORM_TASK_GROUP
+                it.description = "Write partial backend configuration file for '${sourceSet.name}'"
+                it.backendText.set(sourceSet.backendText.map { text -> text })
+                // TODO clean this up I could add this logic to the source set
+                it.backendConfig.set(
+                    File(
+                        project.layout.buildDirectory.get().asFile,
+                        "${sourceSet.name}/tf/remoteState/backend-config.tf",
+                    ),
+                )
+            }
 
         project.tasks.named(taskName(sourceSet.name, "init"), TerraformInit::class.java).configure { it ->
             it.dependsOn(remoteStateTask)
-            it.backendConfig.set(File(project.layout.buildDirectory.get().asFile, "${sourceSet.name}/tf/remoteState/backend-config.tf"))
+            it.backendConfig.set(
+                File(project.layout.buildDirectory.get().asFile, "${sourceSet.name}/tf/remoteState/backend-config.tf"),
+            )
             it.useBackendConfig.set(true)
         }
     }

@@ -5,10 +5,9 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.options.Option
 import org.ysb33r.gradle.terraform.ExecSpec
-
-import javax.inject.Inject
 import java.io.File
 import java.net.URI
+import javax.inject.Inject
 
 /** Equivalent of {@code terraform show}.
  * shows the state of the terraform plan
@@ -21,9 +20,12 @@ abstract class TerraformShowState : TerraformTask {
     constructor() : super("show", emptyList()) {
         statusReportOutputFile.set(
             project.provider {
-                File(sourceSet.get().reportsDir.get().asFile,
-                    "${sourceSet.get().name}.status.${if (json) "tf.json" else "tf"}")
-            })
+                File(
+                    sourceSet.get().reportsDir.get().asFile,
+                    "${sourceSet.get().name}.status.${if (json) "tf.json" else "tf"}",
+                )
+            },
+        )
 
         supportsColor(false)
         alwaysOutOfDate()
@@ -41,7 +43,7 @@ abstract class TerraformShowState : TerraformTask {
         super.exec()
         val fileLocation: URI = statusReportOutputFile.get().toURI()
         logger.lifecycle(
-            "The textual representation of the state file has been generated into $fileLocation"
+            "The textual representation of the state file has been generated into $fileLocation",
         )
     }
 

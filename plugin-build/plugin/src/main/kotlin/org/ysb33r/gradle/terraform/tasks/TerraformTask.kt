@@ -25,7 +25,7 @@ import java.util.UUID
 import java.util.concurrent.Callable
 import javax.inject.Inject
 
-abstract class TerraformTask(): DefaultTask() {
+abstract class TerraformTask() : DefaultTask() {
     @Internal
     val sourceSet: Property<TerraformSourceSet> = project.objects.property(TerraformSourceSet::class.java)
 
@@ -53,7 +53,7 @@ abstract class TerraformTask(): DefaultTask() {
      */
     protected constructor(
         cmd: String,
-        configExtensions: List<Class<out ConfigExtension>>
+        configExtensions: List<Class<out ConfigExtension>>,
     ) : this() {
         this.tfCommand = cmd
         withConfigExtensions(configExtensions)
@@ -99,9 +99,12 @@ abstract class TerraformTask(): DefaultTask() {
 
     @get:Internal
     protected val planFile: Provider<File>
-        get() = project.provider(Callable<File> {
-            File(sourceSet.get().dataDir.get().asFile, "${sourceSet.get().name}.tf.plan")
-        })
+        get() =
+            project.provider(
+                Callable<File> {
+                    File(sourceSet.get().dataDir.get().asFile, "${sourceSet.get().name}.tf.plan")
+                },
+            )
 
     /**
      * To be called from tasks where the command supports [input].
@@ -124,7 +127,7 @@ abstract class TerraformTask(): DefaultTask() {
      * @param withColor If set to [false], the task will always run without color output.
      */
     protected fun supportsColor(withColor: Boolean = true) {
-        //val mode = projectOperations.consoleOutput
+        // val mode = projectOperations.consoleOutput
         val mode = project.gradle.startParameter.consoleOutput
         if (mode == ConsoleOutput.Plain ||
             (mode == ConsoleOutput.Auto && System.getenv("TERM") == "dumb") ||
@@ -135,17 +138,17 @@ abstract class TerraformTask(): DefaultTask() {
     }
 
     protected fun terraformEnvironment(): Map<String, String> {
-        val environment = mutableMapOf(
-            "TF_DATA_DIR" to sourceSet.get().dataDir.get().asFile.absolutePath,
-            "TF_CLI_CONFIG_FILE" to Convention.terraformRC(project).asFile.absolutePath,
-            "TF_LOG_PATH" to terraformLogFile(name, sourceSet.get().logDir).absolutePath,
-            "TF_LOG" to terraformExtension.logLevel.get(),
-        )
+        val environment =
+            mutableMapOf(
+                "TF_DATA_DIR" to sourceSet.get().dataDir.get().asFile.absolutePath,
+                "TF_CLI_CONFIG_FILE" to Convention.terraformRC(project).asFile.absolutePath,
+                "TF_LOG_PATH" to terraformLogFile(name, sourceSet.get().logDir).absolutePath,
+                "TF_LOG" to terraformExtension.logLevel.get(),
+            )
         environment.putAll(defaultEnvironment())
         environment.putAll(terraformExtension.getEnvironment())
         return environment
     }
-
 
     /** Adds a command-line provider.
      */
@@ -155,10 +158,13 @@ abstract class TerraformTask(): DefaultTask() {
 
     fun buildExecSpec(): ExecSpec {
         // TODO fix
-        val execSpec = ExecSpec(terraformSetup.executable.get().executablePath().toString(),
-            tfCommand,
-            defaultCommandParameters,
-            terraformEnvironment())
+        val execSpec =
+            ExecSpec(
+                terraformSetup.executable.get().executablePath().toString(),
+                tfCommand,
+                defaultCommandParameters,
+                terraformEnvironment(),
+            )
         addCommandSpecificsToExecSpec(execSpec)
         return execSpec
     }
@@ -168,12 +174,13 @@ abstract class TerraformTask(): DefaultTask() {
      */
     private fun withConfigExtensions(configExtensions: List<Class<out ConfigExtension>>) {
         for (it in configExtensions) {
-            val cex: ConfigExtension = when (it) {
-                Lock::class.java -> terraformExtension.lock
-                Parallel::class.java -> terraformExtension.parallel
-                Json::class.java -> terraformExtension.json
-                else -> project.objects.newInstance(it)
-            }
+            val cex: ConfigExtension =
+                when (it) {
+                    Lock::class.java -> terraformExtension.lock
+                    Parallel::class.java -> terraformExtension.parallel
+                    Json::class.java -> terraformExtension.json
+                    else -> project.objects.newInstance(it)
+                }
             extensions.add(cex.name, cex)
             commandLineProviders.add(project.provider { cex.getCommandLineArgs() })
         }

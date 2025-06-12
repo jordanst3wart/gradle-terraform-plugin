@@ -19,8 +19,8 @@ open class TerraformSetupExtension(project: Project) {
             mapOf(
                 "plugin_cache_may_break_dependency_lock_file" to true,
                 "disable_checkpoint" to true,
-                "disable_checkpoint_signature" to true
-            )
+                "disable_checkpoint_signature" to true,
+            ),
         )
         executable.set(Executable.TERRAFORM)
     }

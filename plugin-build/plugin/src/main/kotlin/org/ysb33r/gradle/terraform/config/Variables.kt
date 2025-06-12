@@ -6,7 +6,7 @@ import java.nio.file.Path
 import kotlin.streams.toList
 
 class Variables(
-    private val directory: DirectoryProperty
+    private val directory: DirectoryProperty,
 ) : VariableSpec {
     val name: String = "variables"
     val vars: MutableMap<String, Any> = mutableMapOf()
@@ -14,30 +14,45 @@ class Variables(
 
     fun commandLineArgs(root: Path): List<String> {
         val varList: MutableList<String> = mutableListOf()
-        varList.addAll(fileNames.stream().map { fileName: String ->
-            "-var-file=${root.resolve(fileName).toFile().absolutePath}"
-        }.toList())
+        varList.addAll(
+            fileNames.stream().map { fileName: String ->
+                "-var-file=${root.resolve(fileName).toFile().absolutePath}"
+            }.toList(),
+        )
         return varList
     }
 
     val fileNames: Set<String>
         get() = this.files.toSet()
 
-    override fun `var`(name: String, value: Any) {
+    override fun `var`(
+        name: String,
+        value: Any,
+    ) {
         vars[name] = value
     }
 
-    override fun map(name: String, map: Map<String, *>) {
+    override fun map(
+        name: String,
+        map: Map<String, *>,
+    ) {
         vars[name] = map
     }
 
-    override fun list(name: String, val1: Any, vararg vals: Any) {
+    override fun list(
+        name: String,
+        val1: Any,
+        vararg vals: Any,
+    ) {
         val inputs = mutableListOf<Any>(val1)
         inputs.addAll(vals)
         vars[name] = inputs
     }
 
-    override fun list(name: String, vals: Iterable<*>) {
+    override fun list(
+        name: String,
+        vals: Iterable<*>,
+    ) {
         vars[name] = vals.toList()
     }
 
@@ -46,10 +61,11 @@ class Variables(
     }
 
     override fun getCommandLineArgs(): List<String> {
-        val root = directory.get().asFile.toPath()
-            ?: throw ConfigurationException(
-                "This method can only be called when attached to a task extension or a source set"
-            )
+        val root =
+            directory.get().asFile.toPath()
+                ?: throw ConfigurationException(
+                    "This method can only be called when attached to a task extension or a source set",
+                )
 
         return this.commandLineArgs(root)
     }

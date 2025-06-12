@@ -1,10 +1,10 @@
 package org.ysb33r.gradle.terraform
 
 import org.gradle.api.Project
+import org.gradle.api.provider.Property
 import org.ysb33r.gradle.terraform.config.Json
 import org.ysb33r.gradle.terraform.config.Lock
 import org.ysb33r.gradle.terraform.config.Parallel
-import org.gradle.api.provider.Property
 
 /** Configure project defaults or task specifics for `Terraform`.
  *
@@ -33,7 +33,7 @@ open class TerraformExtension(private val project: Project) {
     val lock = Lock()
     val parallel = Parallel()
     val json = Json()
-    val logLevel : Property<String> = project.objects.property(String::class.java)
+    val logLevel: Property<String> = project.objects.property(String::class.java)
 
     init {
         logLevel.set("WARN")

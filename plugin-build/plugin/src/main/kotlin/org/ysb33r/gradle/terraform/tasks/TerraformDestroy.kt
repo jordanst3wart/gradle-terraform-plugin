@@ -7,22 +7,27 @@ import org.ysb33r.gradle.terraform.config.Json
 import org.ysb33r.gradle.terraform.config.Lock
 import org.ysb33r.gradle.terraform.config.Parallel
 import org.ysb33r.gradle.terraform.config.Refresh
-
-import javax.inject.Inject
 import java.io.File
 import java.util.concurrent.Callable
+import javax.inject.Inject
 
 /** Equivalent of {@code terraform destroy}.
  *  Note: DOES NOT USE A PLAN FILE
  */
 abstract class TerraformDestroy : TerraformTask {
     @get:Internal
-    val variablesFile: Provider<File> = project.provider(Callable {
-        File(sourceSet.get().dataDir.get().asFile, "__.tfvars")
-    })
+    val variablesFile: Provider<File> =
+        project.provider(
+            Callable {
+                File(sourceSet.get().dataDir.get().asFile, "__.tfvars")
+            },
+        )
 
     @Inject
-    constructor() : super("destroy", listOf(Lock::class.java, Refresh::class.java, Parallel::class.java, Json::class.java)) {
+    constructor() : super(
+        "destroy",
+        listOf(Lock::class.java, Refresh::class.java, Parallel::class.java, Json::class.java),
+    ) {
         supportsAutoApprove()
         supportsInputs()
         supportsColor()

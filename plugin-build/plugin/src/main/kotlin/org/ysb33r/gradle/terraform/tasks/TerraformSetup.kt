@@ -5,7 +5,6 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
@@ -28,8 +27,7 @@ import java.nio.file.attribute.PosixFilePermission.OWNER_WRITE
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
-open class TerraformSetup: DefaultTask() {
-
+open class TerraformSetup : DefaultTask() {
     @get:Input
     val terraformRcMap = project.objects.mapProperty(String::class.java, Boolean::class.java)
 
@@ -50,7 +48,7 @@ open class TerraformSetup: DefaultTask() {
         description = "Generates Terraform rc file, creates plugin cache directory, and downloads binary"
         pluginCacheDir.set(Convention.pluginCacheDir(project))
         terraformRC.set(Convention.terraformRC(project))
-        val executableProvider = project.providers.provider { executable.get().executablePath()}
+        val executableProvider = project.providers.provider { executable.get().executablePath() }
         executableFile.set(executableProvider)
     }
 
@@ -75,10 +73,15 @@ open class TerraformSetup: DefaultTask() {
             Files.setPosixFilePermissions(
                 rc.toPath(),
                 setOf(
-                    OWNER_READ, OWNER_WRITE, OWNER_EXECUTE,
-                    GROUP_READ, GROUP_WRITE, GROUP_EXECUTE,
-                    OTHERS_READ, OTHERS_EXECUTE
-                )
+                    OWNER_READ,
+                    OWNER_WRITE,
+                    OWNER_EXECUTE,
+                    GROUP_READ,
+                    GROUP_WRITE,
+                    GROUP_EXECUTE,
+                    OTHERS_READ,
+                    OTHERS_EXECUTE,
+                ),
             )
         }
         return this.pluginCacheDir
@@ -94,9 +97,9 @@ open class TerraformSetup: DefaultTask() {
             "plugin_cache_dir = \"${
                 escapedFilePath(
                     OperatingSystem.current(),
-                    pluginCacheDir.get().asFile
+                    pluginCacheDir.get().asFile,
                 )
-            }\"\n"
+            }\"\n",
         )
         return writer
     }
@@ -117,19 +120,30 @@ open class TerraformSetup: DefaultTask() {
             Files.setPosixFilePermissions(
                 executableFile.get().toPath(),
                 setOf(
-                    OWNER_READ, OWNER_WRITE, OWNER_EXECUTE,
-                    GROUP_READ, GROUP_WRITE, GROUP_EXECUTE,
-                    OTHERS_READ, OTHERS_EXECUTE
-                )
+                    OWNER_READ,
+                    OWNER_WRITE,
+                    OWNER_EXECUTE,
+                    GROUP_READ,
+                    GROUP_WRITE,
+                    GROUP_EXECUTE,
+                    OTHERS_READ,
+                    OTHERS_EXECUTE,
+                ),
             )
         }
         if (executableFile.get().absolutePath != result.first.absolutePath) {
-            throw IllegalArgumentException("Output file does not match downloaded file: ${executableFile.get().absolutePath} != ${result.first.absolutePath}")
+            throw IllegalArgumentException(
+                "Output file does not match downloaded file: ${
+                    executableFile.get().absolutePath} != ${result.first.absolutePath}",
+            )
         }
     }
 
     // zip extraction functions
-    fun downloadUncompressAndCheck(url: URL, extractionPath: File): Pair<File,File> {
+    fun downloadUncompressAndCheck(
+        url: URL,
+        extractionPath: File,
+    ): Pair<File, File> {
         val fileName = url.toString().substringAfterLast('/')
         if (fileName.isEmpty()) {
             throw IllegalArgumentException("Invalid URL: $url, filename is empty")
@@ -154,7 +168,10 @@ open class TerraformSetup: DefaultTask() {
         throw IllegalArgumentException("File is not a zip file: $tempFile")
     }
 
-    fun uncompressZipFile(zipFile: File, extractionPath: File): File {
+    fun uncompressZipFile(
+        zipFile: File,
+        extractionPath: File,
+    ): File {
         val extractedFiles = mutableListOf<File>()
 
         ZipInputStream(zipFile.inputStream()).use { zipInput ->

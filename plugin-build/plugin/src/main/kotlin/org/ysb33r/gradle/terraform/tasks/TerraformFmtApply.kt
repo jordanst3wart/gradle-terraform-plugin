@@ -5,7 +5,6 @@ import org.ysb33r.gradle.terraform.ExecSpec
 
 /** The [terraform fmt -write=true] command. */
 abstract class TerraformFmtApply : TerraformTask {
-
     constructor() : super("fmt", emptyList())
 
     @get:Input

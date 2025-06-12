@@ -6,7 +6,6 @@ import org.ysb33r.gradle.terraform.ExecSpec
 /** The [terraform fmt -check] command.
  */
 abstract class TerraformFmtCheck : TerraformTask {
-
     constructor() : super("fmt", emptyList())
 
     @get:Input

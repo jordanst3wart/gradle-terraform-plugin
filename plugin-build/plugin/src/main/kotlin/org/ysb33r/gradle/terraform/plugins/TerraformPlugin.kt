@@ -7,20 +7,19 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.language.base.plugins.LifecycleBasePlugin
+import org.gradle.language.base.plugins.LifecycleBasePlugin.CHECK_TASK_NAME
 import org.ysb33r.gradle.terraform.TerraformExtension
 import org.ysb33r.gradle.terraform.TerraformSetupExtension
 import org.ysb33r.gradle.terraform.TerraformSourceSet
 import org.ysb33r.gradle.terraform.internal.Convention
-import org.ysb33r.gradle.terraform.tasks.TerraformTask
-import org.ysb33r.gradle.terraform.tasks.RemoteStateTask
-import org.ysb33r.gradle.terraform.tasks.TerraformFmtCheck
-
-import org.gradle.language.base.plugins.LifecycleBasePlugin.CHECK_TASK_NAME
-import org.ysb33r.gradle.terraform.tasks.DefaultTerraformTasks.FMT_APPLY
 import org.ysb33r.gradle.terraform.internal.Convention.createTasksByConvention
 import org.ysb33r.gradle.terraform.internal.Convention.taskName
 import org.ysb33r.gradle.terraform.tasks.DefaultTerraformTasks
+import org.ysb33r.gradle.terraform.tasks.DefaultTerraformTasks.FMT_APPLY
+import org.ysb33r.gradle.terraform.tasks.RemoteStateTask
+import org.ysb33r.gradle.terraform.tasks.TerraformFmtCheck
 import org.ysb33r.gradle.terraform.tasks.TerraformSetup
+import org.ysb33r.gradle.terraform.tasks.TerraformTask
 import org.ysb33r.gradle.terraform.tasks.TerraformValidate
 
 /**
@@ -28,7 +27,6 @@ import org.ysb33r.gradle.terraform.tasks.TerraformValidate
  * Terraform distributions on a variety of the most common development platforms.
  */
 class TerraformPlugin : Plugin<Project> {
-
     override fun apply(project: Project) {
         registerSetupTerraformTask(project)
 
@@ -56,29 +54,31 @@ class TerraformPlugin : Plugin<Project> {
 
     companion object {
         private fun registerSetupTerraformTask(project: Project) {
-            val terraformSetupExt = project.extensions
-                .create(Convention.TERRAFORM_SETUP_EXT, TerraformSetupExtension::class.java, project)
+            val terraformSetupExt =
+                project.extensions
+                    .create(Convention.TERRAFORM_SETUP_EXT, TerraformSetupExtension::class.java, project)
             project.tasks.register(TerraformSetupExtension.TERRAFORM_SETUP_TASK, TerraformSetup::class.java) { task ->
                 task.group = Convention.TERRAFORM_TASK_GROUP
                 task.description = "Generates Terraform rc file, creates plugin cache directory, and downloads binary"
                 task.terraformRcMap.set(terraformSetupExt.terraformRcMap)
                 task.executable.set(terraformSetupExt.executable)
                 // val executableObj = executable.get()
-                //executableFile.set(executableObj.executablePath())
+                // executableFile.set(executableObj.executablePath())
                 // task.executableFile.set(terraformSetupExt.executable.get().executablePath())
             }
         }
 
         private fun createTerraformSourceSetsExtension(
-            project: Project
+            project: Project,
         ): NamedDomainObjectContainer<TerraformSourceSet> {
-            val factory = NamedDomainObjectFactory { name ->
-                project.objects.newInstance(
-                    TerraformSourceSet::class.java,
-                    project,
-                    name,
-                )
-            }
+            val factory =
+                NamedDomainObjectFactory { name ->
+                    project.objects.newInstance(
+                        TerraformSourceSet::class.java,
+                        project,
+                        name,
+                    )
+                }
             val sourceSetContainer =
                 project.objects.domainObjectContainer(TerraformSourceSet::class.java, factory)
             project.extensions.add(Convention.TERRAFORM_SOURCESETS, sourceSetContainer)
@@ -88,7 +88,7 @@ class TerraformPlugin : Plugin<Project> {
         private fun terraformSourceSetConventionTaskRules(
             project: Project,
             sourceSetContainer: NamedDomainObjectContainer<TerraformSourceSet>,
-            formatAll: TaskProvider<Task>
+            formatAll: TaskProvider<Task>,
         ) {
             sourceSetContainer.configureEach { sourceSet ->
                 createTasksByConvention(project, sourceSet)

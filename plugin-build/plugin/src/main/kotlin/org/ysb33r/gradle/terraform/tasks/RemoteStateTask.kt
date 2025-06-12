@@ -13,7 +13,6 @@ import java.io.File
  * Generates a remote state file containing partial configuration for backend.
  */
 open class RemoteStateTask : DefaultTask() {
-
     @get:OutputFile
     val backendConfig: Property<File> = project.objects.property(File::class.java)
 

@@ -32,12 +32,16 @@ tasks
             .set(JvmTarget.JVM_17)
     }
 
-fun Map<String, Any?>.getOrSystemEnvOrDefault(key: String, defaultValue: String): String = this.getOrElse(key) {
-    System.getenv().getOrElse(key) {
-        logger.warn("'$key' property is not defined, defaulting to '$defaultValue'")
-        defaultValue
-    }
-}.toString()
+fun Map<String, Any?>.getOrSystemEnvOrDefault(
+    key: String,
+    defaultValue: String,
+): String =
+    this.getOrElse(key) {
+        System.getenv().getOrElse(key) {
+            logger.warn("'$key' property is not defined, defaulting to '$defaultValue'")
+            defaultValue
+        }
+    }.toString()
 
 val githubUsername = project.properties.getOrSystemEnvOrDefault("GH_USERNAME", "jordanst3wart")
 /*
@@ -69,12 +73,15 @@ gradlePlugin {
             implementationClass = "org.ysb33r.gradle.terraform.plugins.TerraformPlugin"
             version = createVersion()
             displayName = "Terraform Plugin"
-            description = "Provides Terraform extension and tasks. No need to have terraform installed as plugin will take care of caching and installation in a similar fashion as to have Gradle distributions are cached"
+            description =
+                """
+                Provides Terraform extension and tasks. No need to have terraform installed as plugin will take care of
+                caching and installation in a similar fashion as to have Gradle distributions are cached
+                """.trimIndent()
             tags = listOf("terraform")
         }
     }
 }
-
 
 publishing {
     repositories {
@@ -99,4 +106,3 @@ tasks.test {
     }
     jvmArgs("--add-opens=java.base/java.lang=ALL-UNNAMED", "--add-opens=java.base/java.util=ALL-UNNAMED")
 }
-

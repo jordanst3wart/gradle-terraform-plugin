@@ -17,12 +17,11 @@ import kotlin.io.writer
  * Generates a destroy plan
  */
 abstract class TerraformDestroyPlan : TerraformTask {
-
     // TODO is @inject needed here?
     @Inject
     constructor() : super(
         "plan",
-        listOf(Lock::class.java, Refresh::class.java, Parallel::class.java, Json::class.java)
+        listOf(Lock::class.java, Refresh::class.java, Parallel::class.java, Json::class.java),
     ) {
         supportsInputs()
         supportsColor()
@@ -35,16 +34,19 @@ abstract class TerraformDestroyPlan : TerraformTask {
         get() = File(sourceSet.get().dataDir.get().asFile, "${sourceSet.get().name}.tf.destroy.plan")
 
     @get:Internal
-    open val variablesFile: Provider<File> = project.provider(Callable {
-        File(sourceSet.get().dataDir.get().asFile, "_d_.tfvars")
-    })
+    open val variablesFile: Provider<File> =
+        project.provider(
+            Callable {
+                File(sourceSet.get().dataDir.get().asFile, "_d_.tfvars")
+            },
+        )
 
     override fun exec() {
         createVarsFile()
         super.exec()
         val planOut = planOutputFile
         logger.lifecycle(
-            "generating plan file ${planOut.toURI()}"
+            "generating plan file ${planOut.toURI()}",
         )
     }
 
@@ -61,12 +63,14 @@ abstract class TerraformDestroyPlan : TerraformTask {
             extensions.getByType(Refresh::class.java).refresh = false
         }
         super.addCommandSpecificsToExecSpec(execSpec)
-        execSpec.args.addAll(listOf(
-            "-out=${planOutputFile},",
-            "-var-file=${variablesFile.get().absolutePath}",
-            "-detailed-exitcode",
-            "-destroy"
-        ))
+        execSpec.args.addAll(
+            listOf(
+                "-out=$planOutputFile,",
+                "-var-file=${variablesFile.get().absolutePath}",
+                "-detailed-exitcode",
+                "-destroy",
+            ),
+        )
         return execSpec
     }
 

@@ -8,17 +8,15 @@ import org.ysb33r.gradle.terraform.config.Json
 import org.ysb33r.gradle.terraform.config.Lock
 import org.ysb33r.gradle.terraform.config.Parallel
 import org.ysb33r.gradle.terraform.config.Refresh
-
-import javax.inject.Inject
 import java.io.File
 import java.util.concurrent.Callable
+import javax.inject.Inject
 
 abstract class TerraformPlan : TerraformTask {
-
     @Inject
     constructor() : super(
         "plan",
-        listOf(Lock::class.java, Refresh::class.java, Parallel::class.java, Json::class.java)
+        listOf(Lock::class.java, Refresh::class.java, Parallel::class.java, Json::class.java),
     ) {
         supportsInputs()
         supportsColor()
@@ -30,7 +28,6 @@ abstract class TerraformPlan : TerraformTask {
      *
      * @return Location of plan file.
      */
-    // TODO maybe should just be planFile
     @get:OutputFile
     open val planOutputFile: File
         get() = File(sourceSet.get().dataDir.get().asFile, "${sourceSet.get().name}.tf.plan")
@@ -39,16 +36,19 @@ abstract class TerraformPlan : TerraformTask {
      * @return Location of variables file.
      */
     @get:Internal
-    open val variablesFile: Provider<File> = project.provider(Callable {
-        File(sourceSet.get().dataDir.get().asFile, "__.tfvars")
-    })
+    open val variablesFile: Provider<File> =
+        project.provider(
+            Callable {
+                File(sourceSet.get().dataDir.get().asFile, "__.tfvars")
+            },
+        )
 
     override fun exec() {
         createVarsFile()
         super.exec()
         val planOut = planOutputFile
         logger.lifecycle(
-            "generating plan file ${planOut.toURI()}"
+            "generating plan file ${planOut.toURI()}",
         )
     }
 
@@ -65,11 +65,13 @@ abstract class TerraformPlan : TerraformTask {
             extensions.getByType(Refresh::class.java).refresh = false
         }
         super.addCommandSpecificsToExecSpec(execSpec)
-        execSpec.args.addAll(listOf(
-            "-out=${planOutputFile}",
-            "-var-file=${variablesFile.get().absolutePath}",
-            "-detailed-exitcode",
-        ))
+        execSpec.args.addAll(
+            listOf(
+                "-out=$planOutputFile",
+                "-var-file=${variablesFile.get().absolutePath}",
+                "-detailed-exitcode",
+            ),
+        )
         return execSpec
     }
 

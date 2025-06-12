@@ -12,10 +12,8 @@ import org.ysb33r.gradle.terraform.errors.MissingConfiguration
 import java.io.File
 
 abstract class TerraformInit : TerraformTask {
-
     @get:Internal
     var skipChildModules: Boolean = false
-
 
     @Input
     val useBackendConfig: Property<Boolean>
@@ -29,22 +27,10 @@ abstract class TerraformInit : TerraformTask {
      */
     @get:OutputDirectory
     val pluginDirectory: Provider<File>
-        get() = sourceSet.map { source ->
-            source.dataDir.map { File(it.asFile, "providers") }
-        } as Provider<File>
-
-    // TODO not having these assumes you are using a remote backend...
-    /**
-     * The location of [terraform.tfstate].
-     */
-    //@OutputFile
-    //final Provider<File> terraformStateFile
-
-    /**
-     * The location of the file that provides details about the last run of this task.
-     */
-    //@OutputFile
-    //final Provider<File> terraformInitStateFile
+        get() =
+            sourceSet.map { source ->
+                source.dataDir.map { File(it.asFile, "providers") }
+            } as Provider<File>
 
     constructor() : super("init", emptyList()) {
         supportsInputs()
