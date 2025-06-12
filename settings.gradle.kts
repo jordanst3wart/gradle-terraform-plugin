@@ -1,6 +1,7 @@
 pluginManagement {
     fun getEnvOrThrow(environmentVariable: String): String =
-        System.getenv(environmentVariable) ?: throw InvalidUserDataException("Please provide \"$environmentVariable\" env varname")
+        System.getenv(environmentVariable)
+            ?: throw InvalidUserDataException("Please provide \"$environmentVariable\" env varname")
 
     repositories {
         mavenLocal()
@@ -25,5 +26,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "gradle-terraform-plugin"
-include("plugin")
 include(":example")
+includeBuild("plugin-build")
