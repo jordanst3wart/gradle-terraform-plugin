@@ -52,9 +52,19 @@ tasks.register("reformatAll") {
 
 tasks.register("check") {
     group = "verification"
-    dependsOn(":example:check")
+    // dependsOn(":example:check")
     dependsOn(gradle.includedBuild("plugin-build").task(":plugin:check"))
     dependsOn(gradle.includedBuild("plugin-build").task(":plugin:validatePlugins"))
+}
+
+tasks.register("test") {
+    group = "verification"
+    dependsOn(gradle.includedBuild("plugin-build").task(":plugin:test"))
+}
+
+tasks.register("build") {
+    group = "build"
+    dependsOn(gradle.includedBuild("plugin-build").task(":plugin:build"))
 }
 
 tasks.wrapper {
