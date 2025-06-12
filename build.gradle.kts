@@ -47,32 +47,32 @@ tasks.register("reformatAll") {
     description = "Reformat all the Kotlin Code"
 
     dependsOn("ktlintFormat")
-    dependsOn(gradle.includedBuild("plugin-build").task(":plugin:ktlintFormat"))
+    dependsOn(gradle.includedBuild("build-plugin").task(":plugin:ktlintFormat"))
 }
 
 tasks.register("check") {
     group = "verification"
     // dependsOn(":example:check")
-    dependsOn(gradle.includedBuild("plugin-build").task(":plugin:check"))
-    dependsOn(gradle.includedBuild("plugin-build").task(":plugin:validatePlugins"))
+    dependsOn(gradle.includedBuild("build-plugin").task(":plugin:check"))
+    dependsOn(gradle.includedBuild("build-plugin").task(":plugin:validatePlugins"))
 }
 
 tasks.register("test") {
     group = "verification"
     // could include example:test
-    dependsOn(gradle.includedBuild("plugin-build").task(":plugin:test"))
+    dependsOn(gradle.includedBuild("build-plugin").task(":plugin:test"))
 }
 
 tasks.register("build") {
     group = "build"
     // could include example:build
-    dependsOn(gradle.includedBuild("plugin-build").task(":plugin:build"))
+    dependsOn(gradle.includedBuild("build-plugin").task(":plugin:build"))
 }
 
 tasks.register("assemble") {
     group = "build"
     // could include example:assemble
-    dependsOn(gradle.includedBuild("plugin-build").task(":plugin:assemble"))
+    dependsOn(gradle.includedBuild("build-plugin").task(":plugin:assemble"))
 }
 
 tasks.wrapper {

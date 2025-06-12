@@ -31,5 +31,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = ("plugin-build")
+rootProject.name = ("build-plugin")
 include(":plugin")

@@ -1,7 +1,7 @@
 [versions]
 kotlin = "2.1.21"
 grgitVersion = "5.2.2"
-ktlintGradle = "12.1.1"
+ktlintGradle = "12.3.0"
 
 [plugins]
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin"}
