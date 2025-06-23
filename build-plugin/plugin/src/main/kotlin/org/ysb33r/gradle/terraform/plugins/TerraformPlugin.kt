@@ -111,8 +111,8 @@ class TerraformPlugin : Plugin<Project> {
         private fun configureRootTask(project: Project) {
             DefaultTerraformTasks.tasks().forEach { task ->
                 if (task == DefaultTerraformTasks.INIT) {
-                    project.tasks.findByName(task.command)
-                        ?: project.tasks.replace(task.command)
+                    return@forEach // "init" can clash with "./gradlew init", or creating a new Gradle project
+                    // "init" can also be handled by task dependency resolution
                 }
                 project.tasks.findByName(task.command)
                     ?: project.tasks.register(task.command) {
