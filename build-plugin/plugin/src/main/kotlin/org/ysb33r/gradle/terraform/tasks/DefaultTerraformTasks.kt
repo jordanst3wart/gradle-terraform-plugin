@@ -6,6 +6,7 @@ enum class DefaultTerraformTasks(
     val type: Class<out TerraformTask>,
     val description: String,
 ) {
+    // init can clash with "./gradlew init", or creating a new Gradle project
     INIT("init", TerraformInit::class.java, "Initialises Terraform"),
     SHOW_STATE("showState", TerraformShowState::class.java, "Generates a report on the current state"),
     SHOW("show", TerraformShow::class.java, "Generates a report from a plan file"),
