@@ -11,3 +11,4 @@ TMP/
 .asciidoctorconfig
 .generated-src/
 *.lock.hcl
+.kotlin/

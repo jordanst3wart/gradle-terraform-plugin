@@ -110,6 +110,10 @@ class TerraformPlugin : Plugin<Project> {
         // root tasks to run plans for all source sets
         private fun configureRootTask(project: Project) {
             DefaultTerraformTasks.tasks().forEach { task ->
+                if (task == DefaultTerraformTasks.INIT) {
+                    return@forEach // "init" can clash with "./gradlew init", or creating a new Gradle project
+                    // "init" can also be handled by task dependency resolution
+                }
                 project.tasks.findByName(task.command)
                     ?: project.tasks.register(task.command) {
                         it.group = Convention.TERRAFORM_TASK_GROUP
