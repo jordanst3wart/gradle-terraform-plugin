@@ -56,7 +56,10 @@ open class TerraformSetup : DefaultTask() {
     fun exec() {
         createTerraformRcFile()
         createPluginCacheDir()
-        downloadAndExtractZipFile()
+        if (!executableFile.get().exists()) {
+            logger.lifecycle("Terraform executeable does not exist downloading to: ${executableFile.get().path}")
+            downloadAndExtractZipFile()
+        }
         // TODO verify checksum, and verify signatures of downloaded file
     }
 
